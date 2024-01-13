@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chromosome Visualization</title>
+    <style>
+        #chromosomeContainer {
+    width: 80%;
+    height: 300px;
+    margin: 20px auto;
+    border: 1px solid #000;
+    position: relative;
+}
+
+    </style>
+</head>
+<body>
+    <div id="chromosomeContainer"></div>
+
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+    const container = document.getElementById("chromosomeContainer");
+
+    // Create a simple chromosome representation
+    const chromosome = document.createElement("div");
+    chromosome.style.width = "5px";
+    chromosome.style.height = "100%";
+    chromosome.style.backgroundColor = "blue";
+    chromosome.style.position = "absolute";
+    chromosome.style.left = "50%";
+    chromosome.style.transform = "translateX(-50%)";
+
+    container.appendChild(chromosome);
+});
+
+    </script>
+</body>
+</html>
