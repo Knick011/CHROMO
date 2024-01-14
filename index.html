@@ -1,0 +1,336 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Advanced Genetic Recombination Tool</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f4;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .centered-container {
+            background-color: white;
+            padding: 20px;
+            border-radius: 10px;
+            box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+            text-align: center;
+        }
+
+        select, button {
+            padding: 10px;
+            margin: 10px;
+            border-radius: 5px;
+            border: 1px solid #ddd;
+            outline: none;
+        }
+
+        .centered-button {
+            background-color: #4CAF50;
+            color: white;
+            cursor: pointer;
+            transition: background-color 0.3s;
+        }
+
+        .centered-button:hover {
+            background-color: #45a049;
+        }
+
+        #resultsArea, #explanationArea {
+            margin-top: 20px;
+            padding: 15px;
+            background-color: #f0f0f0;
+            border-radius: 10px;
+        }
+        #explanationArea {
+            font-size: 0.9em;
+        }
+
+        .chromosome {
+            display: inline-block;
+            width: 20px;
+            height: 100px;
+            margin: 5px;
+            border-radius: 5px;
+            text-align: center;
+            color: white;
+            font-weight: bold;
+            line-height: 100px;
+        }
+
+        .allele-A, .allele-B {
+            background-color: #4CAF50; /* Green for Dominant */
+        }
+
+        .allele-a, .allele-b {
+            background-color: #f44336; /* Red for Recessive */
+        }
+        .chromosome-group {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            margin: 10px;
+        }
+
+        .chromosome-container {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+        }
+
+        .allele-select {
+            display: inline-block;
+            margin: 5px;
+        }
+
+        .probability-text {
+            margin-top: 10px;
+            font-weight: bold;
+        }
+        .allele-container {
+            display: flex;
+            justify-content: center;
+        }
+
+    </style>
+</head>
+<body>
+    <div class="centered-container">
+        <h2>Advanced Genetic Recombination Simulator</h2>
+        <p>Select alleles for each parent and simulate recombination with linkage options:</p>
+
+        <!-- Parent 1 Alleles for A, a -->
+        <div class="allele-select">
+            <label>Parent 1 Alleles (Set 1 - A, a):</label><br>
+            <select id="parent1Allele1">
+                <option value="A">Dominant (A)</option>
+                <option value="a">Recessive (a)</option>
+            </select>
+            <select id="parent1Allele2">
+                <option value="A">Dominant (A)</option>
+                <option value="a">Recessive (a)</option>
+            </select>
+        </div>
+
+        <!-- Parent 1 Alleles for B, b -->
+        <div class="allele-select">
+            <label>Parent 1 Alleles (Set 2 - B, b):</label><br>
+            <select id="parent1Allele3">
+                <option value="B">Dominant (B)</option>
+                <option value="b">Recessive (b)</option>
+            </select>
+            <select id="parent1Allele4">
+                <option value="B">Dominant (B)</option>
+                <option value="b">Recessive (b)</option>
+            </select>
+        </div>
+        <!-- Parent 2 Alleles for A, a -->
+        <div class="allele-select">
+            <label>Parent 2 Alleles (Set 1 - A, a):</label><br>
+            <select id="parent2Allele1">
+                <option value="A">Dominant (A)</option>
+                <option value="a">Recessive (a)</option>
+            </select>
+            <select id="parent2Allele2">
+                <option value="A">Dominant (A)</option>
+                <option value="a">Recessive (a)</option>
+            </select>
+        </div>
+
+        <!-- Parent 2 Alleles for B, b -->
+        <div class="allele-select">
+            <label>Parent 2 Alleles (Set 2 - B, b):</label><br>
+            <select id="parent2Allele3">
+                <option value="B">Dominant (B)</option>
+                <option value="b">Recessive (b)</option>
+            </select>
+            <select id="parent2Allele4">
+                <option value="B">Dominant (B)</option>
+                <option value="b">Recessive (b)</option>
+            </select>
+        </div>
+
+        <!-- Linkage Percentage Selector -->
+        <div class="allele-select">
+            <label>Linkage Percentage:</label><br>
+            <select id="linkagePercentage">
+                <option value="0">0%</option>
+                <option value="25">25%</option>
+                <option value="50">50%</option>
+                <option value="100">100%</option>
+            </select>
+        </div>
+
+        <button class="centered-button" id="simulateRecombination">Simulate Recombination</button>
+        <div id="resultsArea"></div>
+
+        <div id="explanationArea">
+            <p>Genetic recombination involves the combination of alleles from each parent, considering genetic linkages. The resulting offspring's traits are determined by these allele combinations and linkage percentages. This tool simulates the possible combinations and their probabilities.</p>
+        </div>
+    </div>
+</body>
+<script>
+
+document.addEventListener("DOMContentLoaded", function() {
+    // Function to generate gametes based on alleles
+    function generateGametes(alleles1, alleles2) {
+        let gametes = [];
+        alleles1.forEach(a1 => {
+            alleles2.forEach(a2 => {
+                gametes.push(a1 + a2);
+            });
+        });
+        return gametes;
+    }
+
+    // Function to calculate combinations of offspring genotypes
+    function calculateOffspringGenotypes(gametesParent1, gametesParent2) {
+        let genotypeCounts = {};
+        gametesParent1.forEach(g1 => {
+            gametesParent2.forEach(g2 => {
+                let genotype = [g1, g2].sort().join('-');
+                genotypeCounts[genotype] = (genotypeCounts[genotype] || 0) + 1;
+            });
+        });
+        return genotypeCounts;
+    }
+
+    // Function to calculate probabilities
+    function calculateProbabilities(genotypeCounts, totalCombinations) {
+        let probabilities = {};
+        for (let genotype in genotypeCounts) {
+            probabilities[genotype] = (genotypeCounts[genotype] / totalCombinations) * 100;
+        }
+        return probabilities;
+    }
+
+    // Function to create a visual representation of chromosomes
+    function createChromosomeVisualization(genotype, title) {
+        const container = document.createElement('div');
+        container.className = 'chromosome-group';
+
+        const titleElement = document.createElement('div');
+        titleElement.textContent = title;
+        titleElement.className = 'chromosome-title';
+        container.appendChild(titleElement);
+
+        const alleleContainer = document.createElement('div');
+        alleleContainer.className = 'allele-container';
+        container.appendChild(alleleContainer);
+
+        genotype.split('-').forEach(gamete => {
+    gamete.split('').forEach(allele => {
+        const chromosome = document.createElement('div');
+        // Use the original allele case for the class name
+        chromosome.className = `chromosome allele-${allele}`;
+        chromosome.textContent = allele;
+        alleleContainer.appendChild(chromosome);
+    });
+});
+
+
+        return container;
+    }
+    // Function to adjust for linkage
+    function adjustForLinkage(gametes, linkage) {
+        if (linkage === 0 || linkage === 100) {
+            return gametes;
+        }
+
+        // Adjust gametes for partial linkage
+        let adjustedGametes = [];
+        let linkedFraction = linkage / 100;
+        let unlinkedFraction = 1 - linkedFraction;
+
+        gametes.forEach(gamete => {
+            // Split the gamete into its alleles
+            let alleles = gamete.split('');
+            // For linked alleles, keep them together
+            if (Math.random() < linkedFraction) {
+                adjustedGametes.push(gamete);
+            } else {
+                // For unlinked alleles, shuffle them
+                alleles.forEach((allele, index) => {
+                    if (Math.random() < unlinkedFraction) {
+                        let otherAlleleIndex = (index % 2 === 0) ? index + 1 : index - 1;
+                        let temp = alleles[index];
+                        alleles[index] = alleles[otherAlleleIndex];
+                        alleles[otherAlleleIndex] = temp;
+                    }
+                });
+                adjustedGametes.push(alleles.join(''));
+            }
+        });
+
+        return adjustedGametes;
+    }
+
+    // Function to display results
+    function displayResults(probabilities, parentContainer, title) {
+        const resultsContainer = document.createElement('div');
+        resultsContainer.className = 'chromosome-container';
+        parentContainer.appendChild(resultsContainer);
+
+        const titleElement = document.createElement('h3');
+        titleElement.textContent = title;
+        resultsContainer.appendChild(titleElement);
+
+        Object.keys(probabilities).forEach(genotype => {
+            const genotypeElement = createChromosomeVisualization(genotype, `Genotype: ${genotype}`);
+            const probabilityText = document.createElement('div');
+            probabilityText.className = 'probability-text';
+            probabilityText.textContent = `Probability: ${probabilities[genotype].toFixed(2)}%`;
+            genotypeElement.appendChild(probabilityText);
+            resultsContainer.appendChild(genotypeElement);
+        });
+    }
+
+    // DOM Elements
+    const resultsArea = document.getElementById("resultsArea");
+    const parent1Allele1 = document.getElementById("parent1Allele1");
+    const parent1Allele2 = document.getElementById("parent1Allele2");
+    const parent1Allele3 = document.getElementById("parent1Allele3");
+    const parent1Allele4 = document.getElementById("parent1Allele4");
+    const parent2Allele1 = document.getElementById("parent2Allele1");
+    const parent2Allele2 = document.getElementById("parent2Allele2");
+    const parent2Allele3 = document.getElementById("parent2Allele3");
+    const parent2Allele4 = document.getElementById("parent2Allele4");
+    const linkagePercentage = document.getElementById("linkagePercentage");
+    // Event listener for the simulate button
+    document.getElementById("simulateRecombination").addEventListener("click", function() {
+        resultsArea.innerHTML = ''; // Clear previous results
+
+        // Retrieve selected alleles and linkage percentage
+        const linkageValue = parseInt(linkagePercentage.value);
+
+        // Generate gametes for both sets of alleles
+        const gametesParent1 = generateGametes([parent1Allele1.value, parent1Allele2.value], [parent1Allele3.value, parent1Allele4.value]);
+        const gametesParent2 = generateGametes([parent2Allele1.value, parent2Allele2.value], [parent2Allele3.value, parent2Allele4.value]);
+
+        // Adjust gametes for linkage
+        const adjustedGametesParent1 = adjustForLinkage(gametesParent1, linkageValue);
+        const adjustedGametesParent2 = adjustForLinkage(gametesParent2, linkageValue);
+
+        // Calculate offspring genotypes
+        const genotypeCounts = calculateOffspringGenotypes(adjustedGametesParent1, adjustedGametesParent2);
+        const totalCombinations = adjustedGametesParent1.length * adjustedGametesParent2.length;
+
+        // Calculate probabilities
+        const probabilities = calculateProbabilities(genotypeCounts, totalCombinations);
+
+        // Display results
+        displayResults(probabilities, resultsArea, 'Offspring Genotypes and Probabilities');
+    });
+});
+
+
+
+</script>
+</html>
