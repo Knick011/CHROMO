@@ -1,39 +1,216 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Chromosome Visualization</title>
-    <style>
-        #chromosomeContainer {
-    width: 80%;
-    height: 300px;
-    margin: 20px auto;
-    border: 1px solid #000;
-    position: relative;
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Genetic Recombination Tool</title>
+<style>
+body {
+font-family: Arial, sans-serif;
+background-color: #f4f4f4;
+margin: 0;
+padding: 0;
+display: flex;
+justify-content: center;
+align-items: center;
+min-height: 100vh;
 }
 
-    </style>
+.centered-container {
+background-color: white;
+padding: 20px;
+border-radius: 10px;
+box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+text-align: center;
+}
+
+select, button {
+padding: 10px;
+margin: 10px;
+border-radius: 5px;
+border: 1px solid #ddd;
+outline: none;
+}
+
+.centered-button {
+background-color: #4CAF50;
+color: white;
+cursor: pointer;
+transition: background-color 0.3s;
+}
+
+.centered-button:hover {
+background-color: #45a049;
+}
+
+#resultsArea, #explanationArea {
+margin-top: 20px;
+padding: 15px;
+background-color: #f0f0f0;
+border-radius: 10px;
+}
+#explanationArea {
+font-size: 0.9em;
+}
+
+.chromosome {
+display: inline-block;
+width: 20px;
+height: 100px;
+margin: 5px;
+border-radius: 5px;
+text-align: center;
+color: white;
+font-weight: bold;
+line-height: 100px;
+}
+
+.allele-A {
+background-color: #4CAF50; /* Green for Dominant */
+}
+
+.allele-a {
+background-color: #f44336; /* Red for Recessive */
+}
+
+.chromosome-group {
+display: flex;
+flex-direction: column;
+align-items: center;
+margin: 10px;
+}
+
+.chromosome-container {
+display: flex;
+justify-content: center;
+flex-wrap: wrap;
+}
+
+.allele-select {
+display: inline-block;
+margin: 5px;
+}
+.allele-container {
+display: flex;
+justify-content: center;
+}
+
+
+.probability-text {
+margin-top: 10px;
+font-weight: bold;
+}
+</style>
 </head>
 <body>
-    <div id="chromosomeContainer"></div>
+<div class="centered-container">
+<h2>Genetic Recombination Simulator</h2>
+<p>Select two alleles for each parent and simulate recombination:</p>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
-    const container = document.getElementById("chromosomeContainer");
+<div class="allele-select">
+<label>Parent 1 Alleles:</label><br>
+<select id="parent1Allele1">
+<option value="A">Dominant (A)</option>
+<option value="a">Recessive (a)</option>
+</select>
+<select id="parent1Allele2">
+<option value="A">Dominant (A)</option>
+<option value="a">Recessive (a)</option>
+</select>
+</div>
 
-    // Create a simple chromosome representation
-    const chromosome = document.createElement("div");
-    chromosome.style.width = "5px";
-    chromosome.style.height = "100%";
-    chromosome.style.backgroundColor = "blue";
-    chromosome.style.position = "absolute";
-    chromosome.style.left = "50%";
-    chromosome.style.transform = "translateX(-50%)";
+<div class="allele-select">
+<label>Parent 2 Alleles:</label><br>
+<select id="parent2Allele1">
+<option value="A">Dominant (A)</option>
+<option value="a">Recessive (a)</option>
+</select>
+<select id="parent2Allele2">
+<option value="A">Dominant (A)</option>
+<option value="a">Recessive (a)</option>
+</select>
+</div>
 
-    container.appendChild(chromosome);
+<button class="centered-button" id="simulateRecombination">Simulate Recombination</button>
+<div id="resultsArea"></div>
+
+<div id="explanationArea">
+<p>Genetic recombination involves the combination of alleles from each parent. The resulting offspring's traits are determined by these allele combinations. This tool simulates the possible combinations and their probabilities.</p>
+</div>
+</div>
+<script>
+document.addEventListener("DOMContentLoaded", function() {
+const resultsArea = document.getElementById("resultsArea");
+const parent1Allele1 = document.getElementById("parent1Allele1");
+const parent1Allele2 = document.getElementById("parent1Allele2");
+const parent2Allele1 = document.getElementById("parent2Allele1");
+const parent2Allele2 = document.getElementById("parent2Allele2");
+
+document.getElementById("simulateRecombination").addEventListener("click", function() {
+resultsArea.innerHTML = ''; // Clear previous results
+
+const allelesParent1 = [parent1Allele1.value, parent1Allele2.value];
+const allelesParent2 = [parent2Allele1.value, parent2Allele2.value];
+const possibleCombinations = calculateCombinations(allelesParent1, allelesParent2);
+
+const parentContainer = document.createElement('div');
+parentContainer.className = 'chromosome-container';
+resultsArea.appendChild(parentContainer);
+
+parentContainer.appendChild(createChromosomeVisualization(allelesParent1, 'Parent 1 Chromosomes'));
+parentContainer.appendChild(createChromosomeVisualization(allelesParent2, 'Parent 2 Chromosomes'));
+
+const offspringContainer = document.createElement('div');
+offspringContainer.className = 'chromosome-container';
+resultsArea.appendChild(offspringContainer);
+
+Object.keys(possibleCombinations).forEach(combination => {
+const combinationElement = createChromosomeVisualization(combination.split(''), `Offspring Chromosomes (${combination})`);
+const probabilityText = document.createElement('div');
+probabilityText.className = 'probability-text';
+probabilityText.textContent = `Probability: ${possibleCombinations[combination]}%`;
+combinationElement.appendChild(probabilityText);
+offspringContainer.appendChild(combinationElement);
+});
 });
 
-    </script>
+function createChromosomeVisualization(alleles, title) {
+const container = document.createElement('div');
+container.className = 'chromosome-group';
+
+const titleElement = document.createElement('div');
+titleElement.textContent = title;
+titleElement.className = 'chromosome-title';
+container.appendChild(titleElement);
+
+const alleleContainer = document.createElement('div');
+alleleContainer.className = 'allele-container';
+container.appendChild(alleleContainer);
+
+alleles.forEach(allele => {
+const chromosome = document.createElement('div');
+chromosome.className = `chromosome allele-${allele}`;
+chromosome.textContent = allele;
+alleleContainer.appendChild(chromosome);
+});
+
+return container;
+}
+
+
+
+function calculateCombinations(alleles1, alleles2) {
+let combinations = {};
+alleles1.forEach(a1 => {
+alleles2.forEach(a2 => {
+let combo = (a1 + a2).split('').sort().join(''); // Sort alleles for uniformity
+combinations[combo] = (combinations[combo] || 0) + 25;
+});
+});
+return combinations;
+}
+});
+</script>
+
 </body>
 </html>
