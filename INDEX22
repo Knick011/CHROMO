@@ -69,8 +69,12 @@
         </div>
     </div>
 
-    <script>
-        document.addEventListener("DOMContentLoaded", function() {
+      
+      
+
+            <script>
+
+                document.addEventListener("DOMContentLoaded", function() {  
             // Accessing elements from the DOM
             const crossTypeSelect = document.getElementById("crossTypeSelect");
             const resultsArea = document.getElementById("resultsArea");
@@ -101,7 +105,7 @@
     
                 return container;
             }
-    
+            
             // Function to update UI based on selected cross type
             function updateUIForCrossType() {
                 // Clear previous UI elements
@@ -216,9 +220,8 @@
             function determineRecombinantType(phenotype) {
                 // Logic to determine recombinant type (Parental or Recombinant)
                 // This logic may vary based on the specific rules of the simulation
-                return phenotype === 'AB' or phenotype === 'ab' ? 'Parental' : 'Recombinant';
+                return phenotype === 'AB' || phenotype === 'ab' ? 'Parental' : 'Recombinant';
             }
-
             // Function to calculate recombination frequency and map distance
             function calculateRecombinationFrequencyAndMapDistance(offspringResults) {
                 const totalOffspring = offspringResults.length;
@@ -305,8 +308,13 @@
             }
 
             // Call to initialize the application
-            document.addEventListener("DOMContentLoaded", initializeApplication);
+            document.addEventListener("DOMContentLoaded", initializeApplication); 
+
         
-    </script>
+    
+         </script>
+       
+        
+    
 </body>
 </html>
